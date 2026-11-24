@@ -361,9 +361,5 @@ All screenshots are stored in [`docs/`](docs/).
 
 | Date | Member | Task | Commit |
 |---|---|---|---|
-| _[date]_ | Raymart D. Ladiao (@raymartladiao) | _[task]_ | `4ebaa55` |
-| _[date]_ | Dyanne Grace V. Pumaren (@dyannegracevpumaren87) | _[task]_ | N/A |
-
-**Checkpoints:** (1) theme and concept approval - _[date]_; (2) working server and multi-client group chat - _[date]_; (3) integrated original features and testing - _[date]_; (4) final submission and demonstration - _[date]_.
-
----
+| _[11/24/2026]_ | Raymart D. Ladiao (@raymartladiao) | _[Server and Client]_ | `e0add9ae4308971fc37b7d7b581b001e3f01a60b` |
+| _[N/A]_ | Dyanne Grace V. Pumaren (@dyannegracevpumaren87) | _[task]_ | N/A |
