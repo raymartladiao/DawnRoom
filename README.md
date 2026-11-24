@@ -2,7 +2,7 @@
 
 **Course / Section:** ITAS1 - Network Programming - _[your section]_
 **School:** Iloilo State University of Fisheries and Technology (ISUFST)
-**Instructor:** Kenth Joshua Espinia
+**Instructor:** Kenth Joshua Espina
 **Repository:** `ITAS1-[Section]-Ladiao-Pumaren`
 **Final commit hash submitted:** `4ebaa55`
 
