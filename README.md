@@ -362,4 +362,4 @@ All screenshots are stored in [`docs/`](docs/).
 | Date | Member | Task | Commit |
 |---|---|---|---|
 | _[11/24/2026]_ | Raymart D. Ladiao (@raymartladiao) | _[Server and Client]_ | `e0add9ae4308971fc37b7d7b581b001e3f01a60b` |
-| _[N/A]_ | Dyanne Grace V. Pumaren (@dyannegracevpumaren87) | _[task]_ | N/A |
+| _[N/A]_ | Dyanne Grace V. Pumaren (@dyannegracevpumaren87) | _N/A_ | N/A |
