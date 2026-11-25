@@ -3,7 +3,7 @@
 **Course / Section:** ITAS1 - Network Programming - _BSIT 2B-SD_
 **School:** Iloilo State University of Fisheries and Technology (ISUFST)
 **Instructor:** Kenth Joshua Espina
-**Repository:** `ITAS1-[Section]-Ladiao-Pumaren`
+**Repository:** `ITAS1-BSIT 2B-SD-Ladiao-Pumaren`
 **Final commit hash submitted:** `4ebaa55`
 
 > Fan-made school project. Not affiliated with or endorsed by Moonton. The map is a simplified original drawing made with Java2D; no game art, icons, or assets are used.
