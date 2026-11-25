@@ -15,11 +15,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-/**
- * DawnRoom GUI client (Swing) - MLBB Map Meeting.
- * Threading: a reader thread blocks on the socket; every UI change is pushed to the Event Dispatch Thread
- * with SwingUtilities.invokeLater. Outgoing writes go through a single-thread executor so the GUI never blocks.
- */
 public class DawnClient extends JFrame {
     private static final String HINT = "Hover the map to see zone names. Click to place the selected call.";
     private static final Map<String, String> ROLE_INFO = Map.of(
@@ -29,14 +24,13 @@ public class DawnClient extends JFrame {
             "Jungler", "Farms the jungle, takes Turtle and Lord",
             "Roamer", "Moves between lanes: vision, ganks, support");
 
-    // connection controls
+   
     private final JTextField hostField = new JTextField("localhost", 11);
     private final JTextField portField = new JTextField(String.valueOf(Protocol.DEFAULT_PORT), 5);
     private final JTextField nickField = new JTextField(10);
     private final Theme.Btn connectBtn = new Theme.Btn("Connect");
     private final JLabel status = new JLabel("Disconnected");
 
-    // chat panel (right side)
     private final JTextArea chatArea = new JTextArea();
     private final DefaultListModel<String> userModel = new DefaultListModel<>();
     private final JList<String> userList = new JList<>(userModel);
@@ -44,14 +38,12 @@ public class DawnClient extends JFrame {
     private final JTextField inputField = new JTextField();
     private final Theme.Btn sendBtn = new Theme.Btn("Send");
 
-    // tactical map view
     private final MapPanel mapPanel = new MapPanel();
     private final Theme.Btn undoCallBtn = new Theme.Btn("Undo my last call");
     private final Theme.Btn clearMapBtn = new Theme.Btn("Clear map (shotcaller)");
     private final JLabel zoneLabel = new JLabel(HINT);
     private String selectedKind = "ATTACK";
 
-    // lane lineup view
     private final JLabel lineupHeader = new JLabel(" ");
     private final JPanel rolesPanel = new JPanel();
     private final Theme.Btn releaseRoleBtn = new Theme.Btn("Release my role");
@@ -60,7 +52,6 @@ public class DawnClient extends JFrame {
     private final CardLayout cards = new CardLayout();
     private final JPanel cardHost = new JPanel(cards);
 
-    // network state
     private final ExecutorService sender = Executors.newSingleThreadExecutor(r -> {
         Thread t = new Thread(r, "net-writer"); t.setDaemon(true); return t;
     });
@@ -88,10 +79,9 @@ public class DawnClient extends JFrame {
         });
     }
 
-    // ------------------------------------------------------------------ UI construction
 
     private void buildUi() {
-        // header + connection row
+       
         JLabel logo = new JLabel("DAWNROOM");
         logo.setFont(logo.getFont().deriveFont(Font.BOLD, 24f));
         logo.setForeground(Theme.ACCENT);
@@ -115,7 +105,6 @@ public class DawnClient extends JFrame {
         north.add(brand, BorderLayout.NORTH);
         north.add(conn, BorderLayout.CENTER);
 
-        // tactical map view
         JPanel kindRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 6, 6));
         kindRow.setBackground(Theme.BG);
         kindRow.add(new JLabel("Call:"));
@@ -137,7 +126,6 @@ public class DawnClient extends JFrame {
         mapView.add(mapPanel, BorderLayout.CENTER);
         mapView.add(zoneLabel, BorderLayout.SOUTH);
 
-        // lane lineup view
         lineupHeader.setFont(lineupHeader.getFont().deriveFont(Font.BOLD, 16f));
         lineupHeader.setForeground(Theme.ACCENT);
         lineupHeader.setBorder(new EmptyBorder(10, 4, 10, 4));
@@ -161,7 +149,7 @@ public class DawnClient extends JFrame {
         cardHost.add(mapView, "map");
         cardHost.add(lineupView, "lineup");
 
-        // view switcher
+   
         Theme.Chip mapNav = new Theme.Chip("Tactical Map", Theme.ACCENT2);
         Theme.Chip lineupNav = new Theme.Chip("Lane Lineup", Theme.ACCENT2);
         mapNav.setSelected(true);
@@ -178,7 +166,7 @@ public class DawnClient extends JFrame {
         left.add(navRow, BorderLayout.NORTH);
         left.add(cardHost, BorderLayout.CENTER);
 
-        // chat panel
+     
         chatArea.setEditable(false);
         chatArea.setLineWrap(true);
         chatArea.setWrapStyleWord(true);
@@ -223,7 +211,6 @@ public class DawnClient extends JFrame {
 
     private boolean holdsRole() { return !myNick.isEmpty() && roleHolders.containsValue(myNick); }
 
-    /** Enables/disables controls from the current connection, shotcaller and lineup state. */
     private void refreshButtons() {
         boolean cap = iAmShotcaller();
         mapPanel.setEnabled(connected);
@@ -252,7 +239,6 @@ public class DawnClient extends JFrame {
         refreshButtons();
     }
 
-    // ------------------------------------------------------------------ lane lineup rows
 
     private void rebuildRoles() {
         rolesPanel.removeAll();
@@ -308,7 +294,7 @@ public class DawnClient extends JFrame {
         if (pick != null) send(Protocol.build("ROLEASSIGN", role, pick));
     }
 
-    // ------------------------------------------------------------------ connecting
+
 
     private void connect() {
         String host = hostField.getText().trim();
@@ -331,7 +317,7 @@ public class DawnClient extends JFrame {
         t.start();
     }
 
-    /** Runs on the reader thread: connect, join, then read lines until the connection ends. */
+  
     private void runConnection(String host, int port, String nick) {
         Socket s = new Socket();
         boolean joined = false;
@@ -414,12 +400,11 @@ public class DawnClient extends JFrame {
         System.exit(0);
     }
 
-    // ------------------------------------------------------------------ sending
 
     private void send(String line) {
         final PrintWriter pw = out;
         if (!connected || pw == null) { status.setText("Not connected."); return; }
-        sender.execute(() -> pw.println(line)); // off the EDT
+        sender.execute(() -> pw.println(line)); 
     }
 
     private void sendChat() {
@@ -429,7 +414,7 @@ public class DawnClient extends JFrame {
         send(Protocol.build("MSG", text));
     }
 
-    // ------------------------------------------------------------------ incoming (always on the EDT)
+ 
 
     private void handle(List<String> p) {
         try {
@@ -442,7 +427,7 @@ public class DawnClient extends JFrame {
                 case "SHOTCALLER" -> { shotcallerNick = p.get(1); refreshUsers(); refreshButtons(); updateLineupHeader(); }
                 case "ROLES" -> readRoles(p);
                 case "CALLS" -> readCalls(p);
-                default -> { /* BYE and unknown types need no UI update */ }
+                default -> { }
             }
         } catch (RuntimeException ex) {
             System.err.println("Bad message from server: " + p + " -> " + ex);
