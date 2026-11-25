@@ -3,7 +3,7 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
-/** One instance (one thread) per connected client. Reads lines and hands them to the server. */
+
 public class ClientHandler implements Runnable {
     final Socket socket;
     final DawnServer server;
@@ -18,7 +18,7 @@ public class ClientHandler implements Runnable {
         this.id = server.newClientId();
     }
 
-    /** Synchronized so two threads broadcasting at once never interleave their lines. */
+
     synchronized void send(String line) {
         if (out != null) out.println(line);
     }
@@ -29,7 +29,7 @@ public class ClientHandler implements Runnable {
         try (BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream(), StandardCharsets.UTF_8))) {
             out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8), true);
 
-            socket.setSoTimeout(15000); // a client must send JOIN quickly
+            socket.setSoTimeout(15000); 
             String first = in.readLine();
             socket.setSoTimeout(0);
             if (first == null) return;
