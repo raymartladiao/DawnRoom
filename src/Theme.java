@@ -3,7 +3,7 @@ import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.util.Collections;
 
-/** Purple look & feel shared by every window: colours, UIManager defaults and two custom-painted button types. */
+
 public final class Theme {
     public static final Color BG = new Color(0x140B24), PANEL = new Color(0x1F1235), FIELD = new Color(0x2B1B4A),
             TEXT = new Color(0xF1E9FF), MUTED = new Color(0xA394C7),
@@ -18,7 +18,7 @@ public final class Theme {
             case "GANK" -> new Color(0xFFA24D);
             case "TURTLE" -> new Color(0x3DDC97);
             case "LORD" -> new Color(0xFFD84D);
-            default -> new Color(0xE9DDFF);   // DANGER
+            default -> new Color(0xE9DDFF);  
         };
     }
 
@@ -27,7 +27,7 @@ public final class Theme {
         return lum > 0.6 ? Color.BLACK : Color.WHITE;
     }
 
-    /** Rounded purple push button (painted by hand so it looks the same on every Look and Feel). */
+   
     public static class Btn extends JButton {
         public Btn(String text) {
             super(text);
@@ -51,8 +51,7 @@ public final class Theme {
             super.paintComponent(g);
         }
     }
-
-    /** Rounded toggle "chip": filled with its own colour when selected, outlined when not. */
+    
     public static class Chip extends JToggleButton {
         private final Color on;
 
@@ -91,7 +90,6 @@ public final class Theme {
         }
     }
 
-    /** Applies the purple theme to Swing defaults; must run before any component is created. */
     public static void install() {
         try { UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName()); } catch (Exception ignored) {}
         for (Object key : Collections.list(UIManager.getDefaults().keys())) {
