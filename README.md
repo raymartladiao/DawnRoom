@@ -1,6 +1,6 @@
 # DawnRoom - MLBB Map Meeting (Java LAN Chat)
 
-**Course / Section:** ITAS1 - Network Programming - _[your section]_
+**Course / Section:** ITAS1 - Network Programming - _BSIT 2B-SD_
 **School:** Iloilo State University of Fisheries and Technology (ISUFST)
 **Instructor:** Kenth Joshua Espina
 **Repository:** `ITAS1-[Section]-Ladiao-Pumaren`
