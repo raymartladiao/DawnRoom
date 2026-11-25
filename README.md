@@ -77,7 +77,6 @@ One computer runs the server. Any number of clients on the same LAN or Wi-Fi con
 | **Feature 1** | **Lane Lineup board** - live, server-validated role slots shared by all clients |
 | **Feature 2** | **Shared tactical map** - click-to-call markers that appear on every client |
 | **Sample screens** | See [Screenshots](#screenshots) |
-| **Instructor approval** | _[Instructor name, date]_ |
 
 ---
 
