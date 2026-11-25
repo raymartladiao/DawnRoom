@@ -5,29 +5,26 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.*;
 import java.util.List;
 
-/**
- * The shared tactical map. Draws the stylized board with Java2D in a 1000 x 1000 coordinate space
- * and reports clicks as board coordinates. It only displays what the server sends (see setCalls).
- */
+
 public class MapPanel extends JPanel {
     public interface Listener {
         void place(int x, int y);
-        void hover(String zone);   // "" when the mouse is outside the board
+        void hover(String zone);  
     }
 
     public record CallView(int id, String kind, int x, int y, String nick, String time, String zone) {}
 
     private static final Color LANE = new Color(0x476776), JUNGLE = new Color(0x2F545C), BUSH = new Color(0x03212B),
             RIVER = new Color(0x016B7B), BLUE_BASE = new Color(0x025170), RED_BASE = new Color(0x593036);
-    /** The layout below was traced from a 447 x 447 reference picture; K converts its pixels to board units. */
+   
     private static final double K = 1000 / 447.0;
-    /** {x, y, team} in reference pixels: 0 = blue, 1 = red, 2 = neutral/yellow. */
+
     private static final int[][] TOWERS = {
         {20, 210, 0}, {22, 328, 0}, {88, 358, 0}, {125, 310, 0}, {118, 418, 0}, {200, 428, 0}, {328, 425, 0},
         {245, 15, 1}, {327, 22, 1}, {357, 90, 1}, {422, 120, 1}, {320, 140, 1}, {425, 240, 1},
         {117, 22, 2}, {17, 120, 2}, {272, 185, 2}, {172, 262, 2}, {428, 328, 2}
     };
-    /** {x, y, kind} jungle camps: 0 green, 1 orange, 2 yellow, 3 purple, 4 cyan diamond. */
+
     private static final int[][] CAMPS = {
         {171, 81, 0}, {218, 117, 0}, {72, 193, 0}, {224, 328, 0}, {277, 364, 0}, {375, 256, 0},
         {235, 98, 1}, {207, 348, 1}, {82, 118, 2}, {361, 329, 2}, {112, 232, 3}, {337, 213, 3},
@@ -84,7 +81,7 @@ public class MapPanel extends JPanel {
         return Board.inside(x, y) ? new int[]{x, y} : null;
     }
 
-    // ------------------------------------------------------------------ painting
+  
 
     @Override protected void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g.create();
@@ -134,19 +131,19 @@ public class MapPanel extends JPanel {
         j.lineTo(324, 884); j.lineTo(112, 671); j.closePath();
         g2.setColor(JUNGLE);
         g2.fill(j);
-        g2.setStroke(new BasicStroke(36f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));   // rounds the corners
+        g2.setStroke(new BasicStroke(36f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));  
         g2.draw(j);
 
         Shape clip = g2.getClip();
         g2.clip(j);
-        // dark bush clumps, scattered deterministically so every client draws the same map
+   
         java.util.Random rnd = new java.util.Random(7);
         g2.setColor(BUSH);
         int placed = 0, tries = 0;
         while (placed < 55 && tries++ < 2000) {
             double x = 150 + rnd.nextDouble() * 700, y = 150 + rnd.nextDouble() * 700;
             double w = 40 + rnd.nextDouble() * 50, h = 30 + rnd.nextDouble() * 25, rot = rnd.nextDouble() * Math.PI;
-            if (Math.abs(x + y - 1000) < 125) continue;                       // keep the mid lane clear
+            if (Math.abs(x + y - 1000) < 125) continue;                     
             if (Math.hypot(x - 320, y - 320) < 125 || Math.hypot(x - 680, y - 680) < 125 || Math.hypot(x - 500, y - 500) < 110) continue;
             AffineTransform t = g2.getTransform();
             g2.translate(x, y);
@@ -155,7 +152,7 @@ public class MapPanel extends JPanel {
             g2.setTransform(t);
             placed++;
         }
-        // mid lane: an open diagonal band across the jungle
+    
         g2.setColor(LANE);
         g2.setStroke(new BasicStroke((float) (2 * 58), BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER));
         g2.draw(new Line2D.Double(0, 1000, 1000, 0));
@@ -171,7 +168,7 @@ public class MapPanel extends JPanel {
         drawPit(g2, Board.LORD_X, Board.LORD_Y, 180);
     }
 
-    /** Big river pit with a dark crescent in it; {@code open} turns the crescent's opening (degrees). */
+   
     private void drawPit(Graphics2D g2, int cx, int cy, int open) {
         double r = Board.PIT_R + 15;
         g2.setColor(RIVER);
@@ -218,14 +215,13 @@ public class MapPanel extends JPanel {
         }
     }
 
-    /** Small stacked-roof tower icon, drawn from plain shapes. */
     private void drawTowerIcon(Graphics2D g2, double cx, double cy, Color c, double s) {
         Path2D p = new Path2D.Double();
-        p.moveTo(cx, cy - 30 * s);                                   // top roof
+        p.moveTo(cx, cy - 30 * s);                                  
         p.lineTo(cx + 13 * s, cy - 10 * s); p.lineTo(cx - 13 * s, cy - 10 * s); p.closePath();
-        p.moveTo(cx, cy - 16 * s);                                   // middle roof
+        p.moveTo(cx, cy - 16 * s);                                  
         p.lineTo(cx + 19 * s, cy + 6 * s); p.lineTo(cx - 19 * s, cy + 6 * s); p.closePath();
-        p.moveTo(cx - 24 * s, cy + 26 * s);                          // base
+        p.moveTo(cx - 24 * s, cy + 26 * s);                      
         p.lineTo(cx - 14 * s, cy + 6 * s); p.lineTo(cx + 14 * s, cy + 6 * s); p.lineTo(cx + 24 * s, cy + 26 * s); p.closePath();
         g2.setColor(c);
         g2.fill(p);
