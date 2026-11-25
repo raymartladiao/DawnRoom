@@ -6,30 +6,22 @@ import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * DawnRoom server (MLBB Map Meeting).
- *
- * All shared state (clients, lane lineup, map calls) is guarded by this object's monitor: every method that
- * touches it is synchronized, so concurrent client threads can never corrupt it or interleave broadcasts.
- *
- * Roles: the longest-connected player is the SHOTCALLER. Only the shotcaller may assign roles to others,
- * clear the lineup, or clear the map. This is validated here on the server, not just in the GUI.
- */
+
 public class DawnServer {
     private static final DateTimeFormatter TIME = DateTimeFormatter.ofPattern("HH:mm:ss");
     static final int MAX_CALLS_PER_PLAYER = 5, MAX_CALLS_TOTAL = 40;
 
-    /** One call (marker) on the tactical map. The owner is stored by client id so renames never break it. */
+
     record Call(int id, String kind, int x, int y, int owner, String time, String zone) {}
 
     private final int port;
-    private final List<ClientHandler> clients = new ArrayList<>();   // join order; index 0 = shotcaller
+    private final List<ClientHandler> clients = new ArrayList<>();  
     private int nextClientId = 1, nextCallId = 1;
 
-    // Feature 1: lane lineup (role -> client id)
+  
     private final Map<String, Integer> roleOwner = new LinkedHashMap<>();
 
-    // Feature 2: shared tactical map calls (oldest first)
+
     private final List<Call> calls = new ArrayList<>();
 
     public DawnServer(int port) { this.port = port; }
@@ -77,7 +69,6 @@ public class DawnServer {
         } catch (SocketException ignored) {}
     }
 
-    // ---------------------------------------------------------------- membership
 
     synchronized int newClientId() { return nextClientId++; }
 
@@ -104,7 +95,6 @@ public class DawnServer {
         return null;
     }
 
-    /** Returns an error message, or null on success. */
     synchronized String register(ClientHandler h, String nick) {
         String err = validateNick(nick, h);
         if (err != null) return err;
@@ -128,7 +118,7 @@ public class DawnServer {
         calls.removeIf(c -> c.owner() == h.id);
         System.out.println("[server] " + h.nick + " left (" + clients.size() + " online)");
         broadcastSys(h.nick + " left the room.");
-        if (clients.isEmpty()) {            // empty room: reset everything
+        if (clients.isEmpty()) {          
             roleOwner.clear(); calls.clear();
             return;
         }
@@ -139,7 +129,6 @@ public class DawnServer {
         broadcast(callsLine());
     }
 
-    // ---------------------------------------------------------------- request handling
 
     synchronized void process(ClientHandler h, List<String> p) {
         String type = p.get(0).toUpperCase();
@@ -192,7 +181,7 @@ public class DawnServer {
         }
     }
 
-    // ---- Feature 1: lane lineup
+ 
 
     private void handleRoleClaim(ClientHandler h, String roleArg) {
         String role = canonical(Board.ROLES, roleArg);
@@ -204,7 +193,7 @@ public class DawnServer {
             err(h, role + " is already taken by " + (o == null ? "someone" : o.nick) + ".");
             return;
         }
-        roleOwner.values().removeIf(v -> v == h.id);   // one role per player: claiming a new one frees the old one
+        roleOwner.values().removeIf(v -> v == h.id);
         roleOwner.put(role, h.id);
         broadcastSys(h.nick + " took " + role + ".");
         broadcast(rolesLine());
@@ -226,8 +215,8 @@ public class DawnServer {
         if (target == null) { err(h, "No online player named '" + nick + "'."); return; }
         Integer owner = roleOwner.get(role);
         if (owner != null && owner == target.id) { err(h, target.nick + " already holds " + role + "."); return; }
-        roleOwner.values().removeIf(v -> v == target.id);   // target gives up any other role
-        roleOwner.put(role, target.id);                     // replaces the previous holder, if any
+        roleOwner.values().removeIf(v -> v == target.id);   
+        roleOwner.put(role, target.id);                    
         broadcastSys("Shotcaller " + h.nick + " assigned " + role + " to " + target.nick + ".");
         broadcast(rolesLine());
         announceIfComplete();
@@ -250,7 +239,7 @@ public class DawnServer {
         broadcastSys(sb.toString().trim());
     }
 
-    // ---- Feature 2: shared tactical map
+  
 
     private void handlePing(ClientHandler h, String kindArg, String xs, String ys) {
         String kind = canonical(Board.KINDS, kindArg);
@@ -262,7 +251,7 @@ public class DawnServer {
 
         int mine = 0;
         for (Call c : calls) if (c.owner() == h.id) mine++;
-        while (mine >= MAX_CALLS_PER_PLAYER) {          // keep only each player's newest calls
+        while (mine >= MAX_CALLS_PER_PLAYER) {        
             for (int i = 0; i < calls.size(); i++) {
                 if (calls.get(i).owner() == h.id) { calls.remove(i); break; }
             }
@@ -294,7 +283,6 @@ public class DawnServer {
         broadcast(callsLine());
     }
 
-    // ---------------------------------------------------------------- helpers
 
     private static String arg(List<String> p, int i) { return i < p.size() ? p.get(i) : ""; }
     private static String now() { return LocalTime.now().format(TIME); }
@@ -316,7 +304,7 @@ public class DawnServer {
 
     private String shotcallerLine() { return Protocol.build("SHOTCALLER", shotcaller() == null ? "" : shotcaller().nick); }
 
-    /** ROLES|n|(role,holderNick or empty)* */
+  
     private String rolesLine() {
         List<Object> f = new ArrayList<>();
         f.add(Board.ROLES.size());
@@ -328,7 +316,7 @@ public class DawnServer {
         return Protocol.build("ROLES", f.toArray());
     }
 
-    /** CALLS|n|(id,kind,x,y,nick,time,zone)* */
+   
     private String callsLine() {
         List<Object> f = new ArrayList<>();
         f.add(calls.size());
